@@ -72,9 +72,6 @@ try{
         type:'DEBIT'
     }],{session})
 
-await(()=>{
-    return new Promise((resolve)=>setTimeout(resolve,35*1000))
-})()
 
     const createdCreditLedger=await ledgerModel.create([{
         account:to,
