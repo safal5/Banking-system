@@ -16,6 +16,9 @@ const transactionRouter=require('./routes/transaction.routes')
 /**
  * routes used
  */
+app.get('/',(req,res)=>{
+    res.send("system is up and running")
+})
 app.use('/api/auth',authRouter)
 app.use('/api/account',accountRouter)
 app.use('/api/transaction',transactionRouter)
