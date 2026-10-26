@@ -47,6 +47,7 @@ if(sender.status!=="ACTIVE" || receiver.status!=="ACTIVE"){
     })
 }
 
+
 const currentBalance=await sender.calculateBalance()
 if(currentBalance<amount){
     return res.status(400).json({
@@ -198,5 +199,37 @@ finally{
 
 }
 
+const getTransactionHistory = async (req, res) => {
+    const account = await accountModel.findOne({ user: req.user._id });
+
+    if (!account) {
+        return res.json({ transactions: [] });
+    }
+
+    const records = await transactionModel.find({
+        $or: [{ from: account._id }, { to: account._id }]
+    })
+        .sort({ createdAt: -1 })
+        .limit(20);
+
+    const transactions = records.map(transaction => {
+        const sent = transaction.from.toString() === account._id.toString();
+
+        return {
+            _id: transaction._id,
+            direction: sent ? 'sent' : 'received',
+            amount: transaction.amount,
+            status: transaction.status,
+            createdAt: transaction.createdAt,
+            counterparty: {
+                accountId: sent ? transaction.to : transaction.from
+            }
+        };
+    });
+
+    return res.json({ transactions });
+};
+
 module.exports.handleTransaction=handleTransaction
 module.exports.handleSystemInitialTransaction=handleSystemInitialTransaction
+module.exports.getTransactionHistory = getTransactionHistory

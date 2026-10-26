@@ -1,4 +1,4 @@
-const config=require('./config')
+const config=require('./config').config
 const mongoose=require('mongoose');
 function DBConnection(){
     mongoose.connect(config.MONGODB_URI+'/backend-ledger')

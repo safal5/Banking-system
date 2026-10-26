@@ -6,17 +6,17 @@ if(!process.env.MONGODB_URI){
 if(!process.env.JWT_SECRETKEY){
     throw new Error("JWT_SECRETKEY doesn't exists")
 }
-if(!process.env.GOOGLE_CLIENT_ID){
-    throw new Error("GOOGLE_CLIENT_ID doesn't exists")
+if(!process.env.CLIENT_ID){
+    throw new Error("CLIENT_ID doesn't exists")
 }
-if(!process.env.GOOGLE_CLIENT_SECRET){
-    throw new Error("GOOGLE_CLIENT_SECRETY doesn't exists")
+if(!process.env.CLIENT_SECRET){
+    throw new Error("CLIENT_SECRETY doesn't exists")
 }
-if(!process.env.GOOGLE_REFRESH_TOKEN){
-    throw new Error("GOOGLE_REFRESH_TOKEN doesn't exists")
+if(!process.env.REFRESH_TOKEN){
+    throw new Error("REFRESH_TOKEN doesn't exists")
 }
-if(!process.env.GOOGLE_USER){
-    throw new Error("GOOGLE_USER doesn't exists")
+if(!process.env.EMAIL_USER){
+    throw new Error("EMAIL_USER doesn't exists")
 }
 const config={
     MONGODB_URI:process.env.MONGODB_URI,

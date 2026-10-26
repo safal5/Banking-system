@@ -1,24 +1,32 @@
- 
+const config=require('../config/config').config;
 const jwt=require('jsonwebtoken');
+const crypto=require('crypto');
 const userModel = require('../models/user.model');
-const tokenBlacklistModel = require('../models/token.blacklist.model');
+const sessionModel = require('../models/session.model');
 const authMiddleware=async (req,res,next)=>{
-    const token=req.cookies.token
-if(!token){
+    const refreshToken=req.cookies.refreshToken
+    if(!refreshToken){
     return res.status(401).json({
         message:"you need to be a valid user"
     })
 }
-const blacklistToken=await tokenBlacklistModel.findOne({token})
-if(blacklistToken){
-    return res.status(403).json({
+    const refreshTokenHash=crypto.createHash("sha256").update(refreshToken).digest("hex")
+    const session=await sessionModel.findOne({
+            refreshToken:refreshTokenHash,
+            revoked:false
+        })
+if(!session){
+    return res.status(401).json({
         message:"Forbidden access! not a system user"
     })
 }
 
 try{
-const decoded=jwt.verify(req.cookies.token,process.env.JWT_SECRETKEY);
-const user=await userModel.findOne({_id:decoded.userid});
+const decoded=jwt.verify(req.cookies.refreshToken,config.JWT_SECRETKEY);
+const user=await userModel.findOne({_id:decoded.id});
+if(!user){
+    return res.status(401).json({message:"user not found"})
+}
 req.user=user;
 return next();
 }
@@ -30,27 +38,33 @@ catch(err){
 }
 
 const authSystemMiddleware=async(req,res,next)=>{
-    if (req.cookies.token===""){
+    const refreshToken=req.cookies.refreshToken
+    if(!refreshToken){
         return res.status(401).json({
-            message:'unauthorized users cannot be allowed'
+            message:"you need to be a valid user"
         })
     }
-    const blacklistToken=await tokenBlacklistModel.findOne({token:req.cookies.token})
-    if(blacklistToken){
-    return res.status(403).json({
+    const refreshTokenHash=crypto.createHash("sha256").update(refreshToken).digest("hex")
+    const session=await sessionModel.findOne({
+            refreshToken:refreshTokenHash,
+            revoked:false
+        })
+if(!session){
+    return res.status(401).json({
         message:"Forbidden access! not a system user"
     })
 }
+
     try{
-    const decoded=jwt.verify(req.cookies.token,process.env.JWT_SECRETKEY)
-    const user=await userModel.findById(decoded.userid).select("+systemUser")
-    if(!user.systemUser){
+    const decoded=jwt.verify(req.cookies.refreshToken,config.JWT_SECRETKEY)
+    const user=await userModel.findById(decoded.id).select("+systemUser")
+    if(!user || !user.systemUser){
         return res.status(403).json({
             message:"Not system user: unauthorized users cannot be allowed"
         })
     }
     req.user=user
-    next()
+    return next()
     }catch(err){
         return res.status(401).json({
             message:'unauthorized access: token invalid'

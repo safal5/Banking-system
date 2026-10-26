@@ -20,7 +20,7 @@ transporter.verify((error, success) => {
 const sendMail=async(to,subject,text,html)=>{
     try {
     const info = await transporter.sendMail({
-    from: `"Backend-ledger" <${process.env.EMAIL_USER}>`, // sender address
+    from: `"ABC Bank" <${process.env.EMAIL_USER}>`, // sender address
     to, // list of recipients
     subject, // subject line
     text, // plain text body
@@ -35,9 +35,17 @@ const sendMail=async(to,subject,text,html)=>{
 }
 const registerEmail=async(user,email)=>{
     const to=email;
-    const subject="Welcome to backend ledger";
+    const subject="Welcome to ABC Bank";
     const text=`Hello ${user}.\n\n welcome to our community.\nWe are glad to have you on board\n\nwith regards\nBackend ledger team`;
     const html=`<p>Hello ${user}.</p><p> welcome to our community.</p><p>We are glad to have you on board</p><br><p>with regards</p>Backend ledger team`;
+    await sendMail(to,subject,text,html);
+}
+
+const verifyEmail=async(email,otp,otpHtml)=>{
+    const to=email;
+    const subject="Verify your email address";
+    const text=`Your OTP is ${otp}`;
+    const html=otpHtml;
     await sendMail(to,subject,text,html);
 }
 
@@ -70,3 +78,4 @@ module.exports.registerEmail=registerEmail
 module.exports.sendTransactionEmailSender=sendTransactionEmailSender
 module.exports.sendTransactionEmailReceiver=sendTransactionEmailReceiver
 module.exports.sendCashDepositedEmail=sendCashDepositedEmail
+module.exports.verifyEmail=verifyEmail

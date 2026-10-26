@@ -3,6 +3,7 @@ const { createAccount, getAccount, getAccountBalance } = require('../controller/
 const { authMiddleware } = require('../middlewares/auth.middleware');
 const router=express.Router();
 
+
 router.post('/create',authMiddleware,createAccount)
 
 router.get('/',authMiddleware,getAccount)
